@@ -2,6 +2,8 @@ package springframework.springschool.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import springframework.springschool.DTOs.DTOconverters.ProfessorDTOConverter;
+import springframework.springschool.DTOs.ProfessorDTO;
 import springframework.springschool.domain.Professor;
 import springframework.springschool.domain.Subject;
 import springframework.springschool.repository.ProfessorRepository;
@@ -18,13 +20,17 @@ public class ProfessorService {
 
     private final ProfessorRepository professorRepository;
     private final SubjectRepository subjectRepository;
+    private final ProfessorDTOConverter professorDTOConverter;
 
-    public List<Professor> getProfessors(){
-        return professorRepository.findAll();
+
+    public List<ProfessorDTO> getProfessors(){
+        List<Professor> professors = professorRepository.findAll();
+        return professorDTOConverter.convertProfessorToDTO(professors);
     }
 
-    public List<Professor> getProfessorsBySubject(String subject){
-        return professorRepository.findBySubject(subject);
+    public List<ProfessorDTO> getProfessorsBySubject(String subject){
+        List<Professor> professors = professorRepository.findBySubject(subject);
+            return professorDTOConverter.convertProfessorToDTO(professors);
     }
 
     public void addNewProfessor(CreateProfessorRequest request){
@@ -40,8 +46,7 @@ public class ProfessorService {
 
         if(hasId) {
             Optional<Subject> subject = subjectRepository.findById(request.getSubjectId());
-            if(subject.isPresent())
-                professor.setSubject(subject.get());
+            subject.ifPresent(professor::setSubject);
         }
 
         if(hasName) {

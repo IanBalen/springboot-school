@@ -14,7 +14,7 @@ public class SubjectDTO {
     private String classroom;
     private String subjectType;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<ProfessorDTOWithoutSubject> professorList;
+    private List<ProfessorDTO> professorList;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<StudentDTO> studentList;
 

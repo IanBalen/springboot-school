@@ -2,10 +2,12 @@ package springframework.springschool.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import springframework.springschool.DTOconverters.StudentDTOConverter;
+import springframework.springschool.DTOs.DTOconverters.StudentDTOConverter;
 import springframework.springschool.DTOs.StudentDTO;
 import springframework.springschool.domain.Student;
 import springframework.springschool.domain.Subject;
+import springframework.springschool.exceptionhandler.exceptions.NoStudentsException;
+import springframework.springschool.exceptionhandler.exceptions.StudentDeleteException;
 import springframework.springschool.repository.StudentRepository;
 import springframework.springschool.repository.SubjectRepository;
 import springframework.springschool.services.request.CreateStudentRequest;
@@ -24,25 +26,34 @@ public class StudentService {
 
     public List<StudentDTO> getStudentsByName(String name) {
         List<Student> students = studentRepository.findByNameStartingWith(name);
+        if(students.isEmpty())
+            throw new NoStudentsException();
         return studentDTOConverter.convertStudentToDTO(students);
+
     }
 
     public List<StudentDTO> getStudentsBySurname(String surname) {
         List<Student> students = studentRepository.findBySurnameStartingWith(surname);
+        if(students.isEmpty())
+            throw new NoStudentsException();
         return studentDTOConverter.convertStudentToDTO(students);
     }
 
     public List<StudentDTO> getStudentsByAgeHigherAndLower(int lower, int higher) {
         List<Student> students = studentRepository.findByAgeAfterAndAgeBefore(lower, higher);
+        if(students.isEmpty())
+            throw new NoStudentsException();
         return studentDTOConverter.convertStudentToDTO(students);
     }
 
     public List<StudentDTO> getStudents() {
         List<Student> students = studentRepository.findAll();
+            if(students.isEmpty())
+                throw new NoStudentsException();
         return studentDTOConverter.convertStudentToDTO(students);
     }
 
-    public void addNewStudent(CreateStudentRequest request) {
+    public Student addNewStudent(CreateStudentRequest request) {
         List<Subject> subjectList = new ArrayList<>();
 
         List<String> listOfSubjectType = request.getSubjectTypeList();
@@ -66,12 +77,13 @@ public class StudentService {
 
         student.setSubjectList(subjectList);
 
-        studentRepository.save(student);
+        return studentRepository.save(student);
     }
 
     public void deleteStudent(Long id) {
-        if (studentRepository.existsById(id))
-            studentRepository.deleteById(id);
+        if (!studentRepository.existsById(id))
+            throw new StudentDeleteException();
+        studentRepository.deleteById(id);
 
     }
 
@@ -79,8 +91,6 @@ public class StudentService {
 
         Optional<Student> studentOptional = studentRepository.findById(id);
         int i = 0;
-
-        System.out.println(id + " " + subjectType);
 
         if (studentOptional.isPresent()) {
             Student student = studentOptional.get();
@@ -95,12 +105,8 @@ public class StudentService {
                     studentRepository.save(student);
                 }
             }
-            else{
-                List<Subject> subjectList = new ArrayList<>();
-                subjectList.add(subjectRepository.findBySubjectType(subjectType));
-                student.setSubjectList(subjectList);
-                studentRepository.save(student);
-            }
+            else
+                throw new NoStudentsException();
 
         }
     }

@@ -21,7 +21,17 @@ public class Subject {
     private String classroom;
     private String subjectType;
 
-    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL)
+    @OneToMany(cascade =  {
+            CascadeType.DETACH,
+            CascadeType.REFRESH,
+            CascadeType.PERSIST,
+    })
+    @JoinTable(
+            name = "subject_professor",
+            inverseJoinColumns = @JoinColumn(name = "subject_id"),
+            joinColumns = @JoinColumn(name = "professor_id"),
+            foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT)
+    )
     private List<Professor> professorList;
 
     @ManyToMany(cascade =  {

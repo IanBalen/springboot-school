@@ -20,8 +20,16 @@ public class Professor {
     private String name;
     private String surname;
     private int age;
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "subject_id", referencedColumnName = "id")
+
+    @ManyToOne(cascade =  {
+            CascadeType.DETACH,
+            CascadeType.REFRESH,
+            CascadeType.PERSIST,
+    })
+    @JoinTable(name = "subject_professor",
+               joinColumns = @JoinColumn(name = "subject_id"),
+               inverseJoinColumns = @JoinColumn(name = "professor_id"),
+               foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
     private Subject subject;
 
 }

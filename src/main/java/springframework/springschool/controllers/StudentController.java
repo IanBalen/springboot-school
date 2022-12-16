@@ -1,11 +1,15 @@
 package springframework.springschool.controllers;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springframework.springschool.DTOs.StudentDTO;
+import springframework.springschool.domain.Student;
 import springframework.springschool.services.StudentService;
 import springframework.springschool.services.request.CreateStudentRequest;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,8 +44,8 @@ private final StudentService studentService;
     }
 
     @PostMapping
-    public void addNewStudent(@RequestBody CreateStudentRequest request){
-        studentService.addNewStudent(request);
+    public ResponseEntity<Student> addNewStudent(@RequestBody @Valid CreateStudentRequest request){
+        return new ResponseEntity<>(studentService.addNewStudent(request), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")

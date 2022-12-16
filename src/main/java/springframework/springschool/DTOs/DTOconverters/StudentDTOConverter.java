@@ -1,4 +1,4 @@
-package springframework.springschool.DTOconverters;
+package springframework.springschool.DTOs.DTOconverters;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;

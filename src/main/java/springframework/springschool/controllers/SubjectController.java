@@ -6,6 +6,7 @@ import springframework.springschool.DTOs.SubjectDTO;
 import springframework.springschool.services.SubjectService;
 import springframework.springschool.services.request.CreateSubjectRequest;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,8 +40,7 @@ public class SubjectController {
     }
 
     @PostMapping
-    public void addNewSubject(@RequestBody CreateSubjectRequest request){
-        subjectService.addNewSubject(request);
+    public void addNewSubject(@RequestBody @Valid CreateSubjectRequest request){subjectService.addNewSubject(request);
     }
 
     @DeleteMapping("/{id}")

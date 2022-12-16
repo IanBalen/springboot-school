@@ -1,4 +1,4 @@
-package springframework.springschool.DTOconverters;
+package springframework.springschool.DTOs.DTOconverters;
 
 import org.springframework.stereotype.Component;
 import springframework.springschool.DTOs.SubjectDTO;
@@ -32,7 +32,7 @@ public class SubjectDTOConverter {
                     .subjectType(subject.getSubjectType())
                     .id(subject.getId())
                     .professorList(professorDTOConverter.convertProfessorToDTOWithoutSubject(subject.getProfessorList()))
-                    .studentList(studentDTOConverter.convertStudentToDTOWithoutList(subject.getStudentList()))
+                    .studentList(studentDTOConverter.convertStudentToDTO(subject.getStudentList()))
                     .classroom(subject.getClassroom())
                     .build();
 
@@ -72,7 +72,6 @@ public class SubjectDTOConverter {
 
 
         for(Subject subject : subjectsList){
-            System.out.println(subject.getSubjectType());
             SubjectDTO subjectDTO = SubjectDTO
                     .builder()
                     .subjectType(subject.getSubjectType())
