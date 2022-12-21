@@ -5,13 +5,14 @@ import org.springframework.stereotype.Repository;
 import springframework.springschool.domain.Subject;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public  interface SubjectRepository extends JpaRepository<Subject, Long>{
 
     List<Subject> findByClassroom(String classroom);
 
-    Subject findBySubjectType(String SubjectType);
+    Optional<Subject> findBySubjectType(String SubjectType);
 
     boolean existsBySubjectType(String subjectType);
 

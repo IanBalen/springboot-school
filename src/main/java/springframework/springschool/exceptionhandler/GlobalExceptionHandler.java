@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import springframework.springschool.exceptionhandler.exceptions.NoProfessorException;
+import springframework.springschool.exceptionhandler.exceptions.NoSubjectExists;
 import springframework.springschool.exceptionhandler.exceptions.StudentException;
 import springframework.springschool.exceptionhandler.exceptions.SubjectExistsException;
 
@@ -21,9 +23,9 @@ public class GlobalExceptionHandler {
        return ResponseEntity.badRequest().body(error);
    }
 
-   @ExceptionHandler(StudentException.class)
-    public ResponseEntity<Error<String>> studentHandler(StudentException studentException){
-       Error<String> error = new Error<>(studentException.getMessage(), ZonedDateTime.now());
+   @ExceptionHandler({StudentException.class, NoProfessorException.class, NoSubjectExists.class})
+    public ResponseEntity<Error<String>> notFoundHandler(RuntimeException ex){
+       Error<String> error = new Error<>(ex.getMessage(), ZonedDateTime.now());
        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
    }
 

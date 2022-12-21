@@ -1,13 +1,15 @@
 package springframework.springschool.controllers;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springframework.springschool.DTOs.SubjectDTO;
 import springframework.springschool.services.SubjectService;
 import springframework.springschool.services.request.CreateSubjectRequest;
+import springframework.springschool.services.results.ActionResult;
+import springframework.springschool.services.results.DataResult;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,7 +21,7 @@ public class SubjectController {
     private final SubjectService subjectService;
 
     @GetMapping
-    public List<SubjectDTO> getSubjects(
+    public ResponseEntity<DataResult<List<SubjectDTO>>>getSubjects(
             @RequestParam(required = false) String classroom,
             @RequestParam(required = false) String subjectType
             ){
@@ -28,24 +30,23 @@ public class SubjectController {
         boolean hasSubjectType = Objects.nonNull(subjectType);
 
         if(hasClassroom) {
-            return subjectService.findByClassroom(classroom);
+            return ResponseEntity.ok(subjectService.findByClassroom(classroom));
         }
         if(hasSubjectType) {
-            List<SubjectDTO> list = new ArrayList<>();
-            list.add(subjectService.findBySubjectType(subjectType));
-            return list;
+            return ResponseEntity.ok(subjectService.findBySubjectType(subjectType));
         }
 
-        return subjectService.getSubjects();
+        return ResponseEntity.ok(subjectService.getSubjects());
     }
 
     @PostMapping
-    public void addNewSubject(@RequestBody @Valid CreateSubjectRequest request){subjectService.addNewSubject(request);
+    public ResponseEntity<ActionResult> addNewSubject(@RequestBody @Valid CreateSubjectRequest request){
+        return ResponseEntity.ok(subjectService.addNewSubject(request));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteSubject(@PathVariable(value = "id") Long id){
-        subjectService.deleteSubject(id);
+    public ResponseEntity<ActionResult> deleteSubject(@PathVariable(value = "id") Long id){
+        return ResponseEntity.ok(subjectService.deleteSubject(id));
     }
 
 }

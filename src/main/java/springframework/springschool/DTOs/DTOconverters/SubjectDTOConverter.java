@@ -32,7 +32,7 @@ public class SubjectDTOConverter {
                     .subjectType(subject.getSubjectType())
                     .id(subject.getId())
                     .professorList(professorDTOConverter.convertProfessorToDTOWithoutSubject(subject.getProfessorList()))
-                    .studentList(studentDTOConverter.convertStudentToDTO(subject.getStudentList()))
+                    .studentList(studentDTOConverter.convertStudentToDTOWithoutList(subject.getStudentList()))
                     .classroom(subject.getClassroom())
                     .build();
 

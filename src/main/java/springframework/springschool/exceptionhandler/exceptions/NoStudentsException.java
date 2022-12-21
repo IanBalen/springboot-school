@@ -3,7 +3,7 @@ package springframework.springschool.exceptionhandler.exceptions;
 public class NoStudentsException extends StudentException{
 
     public NoStudentsException() {
-        super("There are no students in database");
+        super("One or more students do not exist, please check your request");
     }
 
 }

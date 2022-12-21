@@ -5,9 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springframework.springschool.DTOs.StudentDTO;
-import springframework.springschool.domain.Student;
 import springframework.springschool.services.StudentService;
 import springframework.springschool.services.request.CreateStudentRequest;
+import springframework.springschool.services.results.ActionResult;
+import springframework.springschool.services.results.DataResult;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -21,7 +22,7 @@ public class StudentController {
 private final StudentService studentService;
 
     @GetMapping()
-    public List<StudentDTO> getStudents(
+    public ResponseEntity<DataResult<List<StudentDTO>>> getStudents(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String surname,
             @RequestParam(required = false) Integer ageL,
@@ -32,20 +33,20 @@ private final StudentService studentService;
         boolean hasAgeH = Objects.nonNull(ageH);
 
         if(hasAgeH && hasAgeL)
-            return studentService.getStudentsByAgeHigherAndLower(ageL, ageH);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(studentService.getStudentsByAgeHigherAndLower(ageL, ageH));
 
         if (hasName)
-            return studentService.getStudentsByName(name); //Marko Mar
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(studentService.getStudentsByName(name)); //Marko Mar
         if (hasSurname)
-            return studentService.getStudentsBySurname(surname);
+            return  ResponseEntity.ok(studentService.getStudentsBySurname(surname));
 
     //localhost:8080/student?name=Marko&surname=Filipovic
-        return studentService.getStudents();
+        return  ResponseEntity.ok(studentService.getStudents());
     }
 
     @PostMapping
-    public ResponseEntity<Student> addNewStudent(@RequestBody @Valid CreateStudentRequest request){
-        return new ResponseEntity<>(studentService.addNewStudent(request), HttpStatus.CREATED);
+    public ResponseEntity<ActionResult> addNewStudent(@RequestBody @Valid CreateStudentRequest request){
+        return ResponseEntity.status(HttpStatus.CREATED).body(studentService.addNewStudent(request));
     }
 
     @DeleteMapping("/{id}")

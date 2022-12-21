@@ -1,19 +1,27 @@
 package springframework.springschool.services;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import springframework.springschool.DTOs.DTOconverters.SubjectDTOConverter;
 import springframework.springschool.DTOs.SubjectDTO;
 import springframework.springschool.domain.Professor;
 import springframework.springschool.domain.Student;
 import springframework.springschool.domain.Subject;
+import springframework.springschool.exceptionhandler.exceptions.NoProfessorException;
+import springframework.springschool.exceptionhandler.exceptions.NoStudentsException;
+import springframework.springschool.exceptionhandler.exceptions.NoSubjectExists;
 import springframework.springschool.exceptionhandler.exceptions.SubjectExistsException;
 import springframework.springschool.repository.ProfessorRepository;
 import springframework.springschool.repository.StudentRepository;
 import springframework.springschool.repository.SubjectRepository;
 import springframework.springschool.services.request.CreateSubjectRequest;
+import springframework.springschool.services.results.ActionResult;
+import springframework.springschool.services.results.DataResult;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -29,12 +37,12 @@ public class SubjectService {
 
 
 
-    public List<SubjectDTO> getSubjects(){
+    public DataResult<List<SubjectDTO>> getSubjects(){
         List<Subject> subjectList =  subjectRepository.findAll();
-        return subjectDTOConverter.convertSubjectToDTOList(subjectList);
+        return new DataResult<>(subjectDTOConverter.convertSubjectToDTOList(subjectList), HttpStatus.FOUND);
     }
 
-    public void addNewSubject(CreateSubjectRequest request){
+    public ActionResult addNewSubject(CreateSubjectRequest request){
 
         if(!subjectRepository.existsBySubjectType(request.getSubjectType())) {
 
@@ -43,6 +51,18 @@ public class SubjectService {
 
             List<Long> listOfStudentsById = request.getStudentList();
             List<Long> listOfProfessorsById = request.getProfessorList();
+
+            for(long id: listOfStudentsById) {
+                Optional<Student> student = studentRepository.findById(id);
+                if(student.isEmpty())
+                    throw new NoStudentsException();
+            }
+
+            for(long id : listOfProfessorsById){
+                Optional<Professor> professor = professorRepository.findById(id);
+                if(professor.isEmpty())
+                    throw new NoProfessorException();
+            }
 
 
             Subject subject = Subject
@@ -71,6 +91,8 @@ public class SubjectService {
 
 
             subjectRepository.save(subject);
+
+           return new ActionResult("Subject has been added to the database", HttpStatus.CREATED);
         }
 
         else
@@ -78,21 +100,30 @@ public class SubjectService {
 
     }
 
-    public void deleteSubject(Long id){
-        if(subjectRepository.existsById(id))
-            subjectRepository.deleteById(id);
+    public ActionResult deleteSubject(Long id){
+        if(!subjectRepository.existsById(id))
+            throw new SubjectExistsException();
+
+        subjectRepository.deleteById(id);
+        return new ActionResult("Subject has been deleted", HttpStatus.OK);
     }
 
-    public List<SubjectDTO> findByClassroom(String classroom){
+    public DataResult<List<SubjectDTO>> findByClassroom(String classroom){
         List<Subject> subjectList = subjectRepository.findByClassroom(classroom);
-        return subjectDTOConverter.convertSubjectToDTOList(subjectList);
+        return new DataResult<>(subjectDTOConverter.convertSubjectToDTOList(subjectList), HttpStatus.FOUND);
     }
 
-    public SubjectDTO findBySubjectType(String subjectType){
+    public DataResult<List<SubjectDTO>> findBySubjectType(String subjectType){
 
-        Subject subject = subjectRepository.findBySubjectType(subjectType);
+        Optional<Subject> subject = subjectRepository.findBySubjectType(subjectType);
 
-        return subjectDTOConverter.convertSubjectToDTOWithoutList(subject);
+        if(subject.isEmpty())
+            throw new NoSubjectExists();
+
+        List<SubjectDTO> list = new ArrayList<>();
+        list.add(subjectDTOConverter.convertSubjectToDTOWithoutList(subject.get()));
+
+        return new DataResult<>(list, HttpStatus.FOUND);
     }
 
 }
