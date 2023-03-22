@@ -15,9 +15,9 @@ import javax.validation.constraints.Pattern;
 public class CreateProfessorRequest {
 
     @Pattern(regexp = "^([^0-9]*)$")
-    private String name;
+    private String firstName;
     @Pattern(regexp = "^([^0-9]*)$")
-    private String surname;
+    private String lastName;
     @Min(25)
     @Max(65)
     private int age;

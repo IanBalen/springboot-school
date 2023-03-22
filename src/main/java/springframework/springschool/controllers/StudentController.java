@@ -1,7 +1,6 @@
 package springframework.springschool.controllers;
 
-import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springframework.springschool.DTOs.StudentDTO;
@@ -16,29 +15,35 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/student")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class StudentController {
 
-private final StudentService studentService;
+    private final StudentService studentService;
+
 
     @GetMapping()
     public ResponseEntity<DataResult<List<StudentDTO>>> getStudents(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String surname,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
             @RequestParam(required = false) Integer ageL,
-            @RequestParam(required = false) Integer ageH) {
-        boolean hasName = Objects.nonNull(name);
-        boolean hasSurname = Objects.nonNull(surname);
+            @RequestParam(required = false) Integer ageH,
+            @RequestParam(required = false) Integer year) {
+        boolean hasName = Objects.nonNull(firstName);
+        boolean hasSurname = Objects.nonNull(lastName);
         boolean hasAgeL = Objects.nonNull(ageL);
         boolean hasAgeH = Objects.nonNull(ageH);
+        boolean hasYear = Objects.nonNull(year);
+
+        if(hasYear)
+            return ResponseEntity.ok(studentService.getStudentsByAcademicYear(year));
 
         if(hasAgeH && hasAgeL)
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(studentService.getStudentsByAgeHigherAndLower(ageL, ageH));
+            return ResponseEntity.ok(studentService.getStudentsByAgeHigherAndLower(ageL, ageH));
 
         if (hasName)
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(studentService.getStudentsByName(name)); //Marko Mar
+            return ResponseEntity.ok(studentService.getStudentsByName(firstName)); //Marko Mar
         if (hasSurname)
-            return  ResponseEntity.ok(studentService.getStudentsBySurname(surname));
+            return  ResponseEntity.ok(studentService.getStudentsBySurname(lastName));
 
     //localhost:8080/student?name=Marko&surname=Filipovic
         return  ResponseEntity.ok(studentService.getStudents());
@@ -46,20 +51,31 @@ private final StudentService studentService;
 
     @PostMapping
     public ResponseEntity<ActionResult> addNewStudent(@RequestBody @Valid CreateStudentRequest request){
-        return ResponseEntity.status(HttpStatus.CREATED).body(studentService.addNewStudent(request));
+        return ResponseEntity.ok(studentService.addNewStudent(request));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteStudent(@PathVariable(value = "id") Long id){
-        studentService.deleteStudent(id);
+    public ResponseEntity<ActionResult> deleteStudent(@PathVariable(value = "id") Long id){
+        return ResponseEntity.ok(studentService.deleteStudent(id));
     }
 
     @PutMapping("/{id}/{subjectType}")
-    public void addSubjectToStudent(@PathVariable(value = "id") Long id,
+    public ResponseEntity<ActionResult> addSubjectToStudent(@PathVariable(value = "id") Long id,
                                     @PathVariable(value = "subjectType") String subjectType){
-
-        studentService.addSubjectToStudent(id, subjectType);
-
-
+        return ResponseEntity.ok(studentService.addSubjectToStudent(id, subjectType));
     }
+
+    @PutMapping("/{id}/{bookName}")
+    public ResponseEntity<ActionResult> assignBookToStudent(@PathVariable(value = "id") Long id,
+                                                            @PathVariable(value = "bookName") String bookName){
+        return ResponseEntity.ok(studentService.assignBookToStudent(id, bookName));
+    }
+
+    @PutMapping("/{studentId}/{bookId}")
+    public ResponseEntity<ActionResult> unassignBookFromStudent(@PathVariable(value = "studentId") Long studentId,
+                                                                @PathVariable(value = "bookId") Long bookId){
+        return ResponseEntity.ok(studentService.unassignBookFromStudent(studentId, bookId));
+    }
+
+
 }

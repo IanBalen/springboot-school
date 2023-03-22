@@ -1,12 +1,15 @@
 package springframework.springschool.services;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import springframework.springschool.DTOs.DTOconverters.ProfessorDTOConverter;
 import springframework.springschool.DTOs.ProfessorDTO;
+import springframework.springschool.domain.Book;
 import springframework.springschool.domain.Professor;
 import springframework.springschool.domain.Subject;
+import springframework.springschool.exceptionhandler.BadRequestException;
+import springframework.springschool.repository.BookRepository;
 import springframework.springschool.repository.ProfessorRepository;
 import springframework.springschool.repository.SubjectRepository;
 import springframework.springschool.services.request.CreateProfessorRequest;
@@ -18,43 +21,57 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProfessorService {
 
     private final ProfessorRepository professorRepository;
     private final SubjectRepository subjectRepository;
+    private final BookRepository bookRepository;
     private final ProfessorDTOConverter professorDTOConverter;
 
 
     public DataResult<List<ProfessorDTO>> getProfessors(){
         List<Professor> professors = professorRepository.findAll();
-        return new DataResult<>(professorDTOConverter.convertProfessorToDTO(professors), HttpStatus.FOUND);
+        if(professors.isEmpty())
+            throw new BadRequestException("No professors found");
+        else
+            return new DataResult<>(professorDTOConverter.convertProfessorToDTO(professors, true), HttpStatus.FOUND);
     }
 
     public DataResult<List<ProfessorDTO>> getProfessorsBySubject(String subject){
         List<Professor> professors = professorRepository.findBySubject(subject);
-            return new DataResult<>(professorDTOConverter.convertProfessorToDTO(professors), HttpStatus.FOUND);
+        if(professors.isEmpty())
+            throw new BadRequestException("No professors found with this subject");
+        else
+            return new DataResult<>(professorDTOConverter.convertProfessorToDTO(professors, true), HttpStatus.FOUND);
     }
 
     public ActionResult addNewProfessor(CreateProfessorRequest request){
 
         boolean hasId = Objects.nonNull(request.getSubjectId());
         boolean hasName = Objects.nonNull(request.getSubjectName());
+
         Professor professor = Professor.builder()
-                .surname(request.getSurname())
-                .name(request.getName())
+                .lastName(request.getLastName())
+                .firstName(request.getFirstName())
                 .age(request.getAge())
                 .build();
 
 
         if(hasId) {
             Optional<Subject> subject = subjectRepository.findById(request.getSubjectId());
-            subject.ifPresent(professor::setSubject);
+            if(subject.isPresent())
+                professor.setSubject(subject.get());
+            else
+                throw new BadRequestException("No subject found with this id");
         }
 
         if(hasName) {
             Optional<Subject> subject = subjectRepository.findBySubjectType(request.getSubjectName());
-            subject.ifPresent(professor::setSubject);
+            if(subject.isPresent())
+                professor.setSubject(subject.get());
+            else
+                throw new BadRequestException("No subject found with this name");
         }
         
         professorRepository.save(professor);
@@ -70,15 +87,93 @@ public class ProfessorService {
             Optional<Subject> subject = subjectRepository.findBySubjectType(subjectType);
             subject.ifPresent(professor::setSubject);
             professorRepository.save(professor);
+            return new ActionResult("Professors subject has been updated", HttpStatus.ACCEPTED);
         }
-        return new ActionResult("Professors subject has been updated", HttpStatus.ACCEPTED);
+        
+        else 
+            throw new BadRequestException("No professor found with this id");
 
     }
 
     public ActionResult deleteProfessor(Long id){
-        if(professorRepository.existsById(id))
+        if(professorRepository.existsById(id)) {
             professorRepository.deleteById(id);
-        return new ActionResult("Professor with id: " + id + " has been deleted", HttpStatus.ACCEPTED);
+            return new ActionResult("Professor with id: " + id + " has been deleted", HttpStatus.ACCEPTED);
+        }
+        else 
+            throw new BadRequestException("No professor found with this id");
+    }
+
+    public ActionResult assignBookToProfessor(Long id, String bookName){
+
+        Optional<Professor> professorOptional = professorRepository.findById(id);
+        List<Book> bookList = bookRepository.findBookByNameOfBook(bookName);
+
+        if(professorOptional.isPresent() && !bookList.isEmpty()){
+
+            Professor professor = professorOptional.get();
+
+            List<Book> professorBookList = professor.getBookList();
+
+            for(Book b : professorBookList)
+                if(b.getNameOfBook().equals(bookName))
+                    throw new BadRequestException("Professor already has this book.");
+
+            boolean bookAssigned = false;
+
+            for(Book b : bookList)
+                if(!b.isBorrowed()){
+                    professor.getBookList().add(b);
+                    b.setBorrowed(true);
+                    bookRepository.save(b);
+                    bookAssigned = true;
+                    break;
+                }
+
+            if(!bookAssigned)
+                throw new BadRequestException("All books with this name are borrowed.");
+
+            professorRepository.save(professor);
+
+            return new ActionResult("Book \"" + bookName + "\" has been borrowed to professor.", HttpStatus.ACCEPTED);
+        }
+
+        else if(professorOptional.isEmpty())
+            throw new BadRequestException("Professor with id: " + id + " does not exist.");
+
+        else
+            throw new BadRequestException("Book with name: " + bookName + " does not exist.");
+    }
+
+    public ActionResult unassignBookFromProfessor(Long professorId, Long bookId){
+
+        Optional<Professor> optionalProfessor = professorRepository.findById(professorId);
+        Optional<Book> optionalBook = bookRepository.findById(bookId);
+
+        if(optionalProfessor.isPresent() && optionalBook.isPresent()){
+
+            Professor student = optionalProfessor.get();
+            Book book = optionalBook.get();
+
+            for(Book b : student.getBookList())
+                if(Objects.equals(b.getId(), bookId)){
+                    student.getBookList().remove(b);
+                    break;
+                }
+
+            book.setBorrowed(false);
+
+            professorRepository.save(student);
+            bookRepository.save(book);
+
+            return new ActionResult("\"" + book.getNameOfBook() + "\" has been removed from professor.", HttpStatus.ACCEPTED);
+        }
+
+        else if(optionalProfessor.isEmpty())
+            throw new BadRequestException("Professor with id: " + professorId + " does not exist.");
+
+        else
+            throw new BadRequestException("Book with id: " + bookId + " does not exist.");
     }
 
 }

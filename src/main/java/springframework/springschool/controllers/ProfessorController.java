@@ -1,6 +1,6 @@
 package springframework.springschool.controllers;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springframework.springschool.DTOs.ProfessorDTO;
@@ -15,7 +15,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/professor")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProfessorController {
 
     private final ProfessorService professorService;
@@ -45,9 +45,22 @@ public class ProfessorController {
         return ResponseEntity.ok(professorService.editSubject(id , subjectType));
         }
 
-    @DeleteMapping(path = "{id}")
+    @DeleteMapping(path = "/{id}")
     public ResponseEntity<ActionResult> deleteProfessor(@PathVariable(value = "id") Long id){
          return ResponseEntity.ok(professorService.deleteProfessor(id));
+    }
+
+    @PutMapping(path = "/b{id}/{bookName}")
+    public ResponseEntity<ActionResult> assignBookToProfessor(@PathVariable(value = "id") Long id,
+                                              @PathVariable(value = "bookName") String bookName){
+        return ResponseEntity.ok(professorService.assignBookToProfessor(id, bookName));
+    }
+
+    @PutMapping(path = "/r{professorId}/{bookId}")
+    public ResponseEntity<ActionResult> unassignBookFromProfessor(@PathVariable(value = "professorId") Long professorId,
+                                                              @PathVariable(value = "bookId") Long bookId){
+
+        return ResponseEntity.ok(professorService.unassignBookFromProfessor(professorId, bookId));
     }
 
 

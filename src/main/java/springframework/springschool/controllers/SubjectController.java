@@ -1,6 +1,6 @@
 package springframework.springschool.controllers;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springframework.springschool.DTOs.SubjectDTO;
@@ -15,7 +15,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/subject")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SubjectController {
 
     private final SubjectService subjectService;

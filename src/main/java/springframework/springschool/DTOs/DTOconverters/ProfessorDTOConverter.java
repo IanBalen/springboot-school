@@ -18,7 +18,7 @@ public class ProfessorDTOConverter {
         this.subjectDTOConverter = subjectDTOConverter;
     }
 
-    public List<ProfessorDTO> convertProfessorToDTO(List<Professor> professorList){
+    public List<ProfessorDTO> convertProfessorToDTO(List<Professor> professorList, boolean hasSubject){
 
         ProfessorDTO professorDTO;
         List<ProfessorDTO> listOfProfessorDTO = new ArrayList<>();
@@ -31,38 +31,15 @@ public class ProfessorDTOConverter {
                     .builder()
                     .id(professor.getId())
                     .age(professor.getAge())
-                    .surname(professor.getSurname())
-                    .name(professor.getName())
+                    .lastName(professor.getLastName())
+                    .firstName(professor.getFirstName())
                     .build();
 
-            if(subject != null)
+            if(subject != null && hasSubject)
                 professorDTO.setSubject(subjectDTOConverter.convertSubjectToDTOWithoutList(subject));
 
 
             listOfProfessorDTO.add(professorDTO);
-        }
-
-        return listOfProfessorDTO;
-    }
-
-    public List<ProfessorDTO> convertProfessorToDTOWithoutSubject(List<Professor> professorList){
-
-        ProfessorDTO professorDTO;
-        List<ProfessorDTO> listOfProfessorDTO = new ArrayList<>();
-
-        for(Professor professor : professorList){
-
-            professorDTO = ProfessorDTO
-                    .builder()
-                    .id(professor.getId())
-                    .age(professor.getAge())
-                    .surname(professor.getSurname())
-                    .name(professor.getName())
-                    .build();
-
-
-            listOfProfessorDTO.add(professorDTO);
-
         }
 
         return listOfProfessorDTO;

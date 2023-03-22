@@ -18,43 +18,24 @@ public class StudentDTOConverter {
         this.subjectDTOConverter = subjectDTOConverter;
     }
 
-    public List<StudentDTO> convertStudentToDTO(List<Student> students){
+    public List<StudentDTO> convertStudentToDTO(List<Student> students, boolean hasSubject){
 
         List<StudentDTO> studentDTOList = new ArrayList<>();
 
 
         for(Student student : students){
-            System.out.println(student.getSubjectList().size());
             StudentDTO studentDTO = StudentDTO
                     .builder()
                     .id(student.getId())
                     .academicYear(student.getAcademicYear())
-                    .name(student.getName())
-                    .surname(student.getSurname())
-                    .age(student.getAge())
-                    .subjectList(subjectDTOConverter.convertSubjectToDTOListWithoutList(student.getSubjectList()))
-                    .build();
-            //System.out.println(studentDTO);
-            studentDTOList.add(studentDTO);
-            //System.out.println(studentDTOList);
-        }
-        return studentDTOList;
-    }
-
-    public List<StudentDTO> convertStudentToDTOWithoutList(List<Student> studentList){
-
-        List<StudentDTO> studentDTOList = new ArrayList<>();
-        StudentDTO studentDTO;
-
-        for(Student student : studentList){
-            studentDTO = StudentDTO
-                    .builder()
-                    .id(student.getId())
-                    .academicYear(student.getAcademicYear())
-                    .name(student.getName())
-                    .surname(student.getSurname())
+                    .firstName(student.getFirstName())
+                    .lastName(student.getLastName())
                     .age(student.getAge())
                     .build();
+
+            if(hasSubject)
+                studentDTO.setSubjectList(subjectDTOConverter.convertSubjectToDTO(student.getSubjectList(), false, false));
+
             studentDTOList.add(studentDTO);
         }
         return studentDTOList;

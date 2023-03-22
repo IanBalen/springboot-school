@@ -46,6 +46,4 @@ public class Subject {
             foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT)
     ))
     private List<Student> studentList;
-
-
 }

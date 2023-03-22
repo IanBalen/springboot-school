@@ -19,7 +19,7 @@ public class SubjectDTOConverter {
     }
 
 
-    public List<SubjectDTO> convertSubjectToDTOList(List<Subject> subjectsList){
+    public List<SubjectDTO> convertSubjectToDTO(List<Subject> subjectsList, boolean hasStudent, boolean hasProfessor){
 
         List<SubjectDTO> subjectDTOList = new ArrayList<>();
 
@@ -27,31 +27,16 @@ public class SubjectDTOConverter {
 
         for(Subject subject : subjectsList){
 
-            subjectDTO = SubjectDTO
-                    .builder()
-                    .subjectType(subject.getSubjectType())
-                    .id(subject.getId())
-                    .professorList(professorDTOConverter.convertProfessorToDTOWithoutSubject(subject.getProfessorList()))
-                    .studentList(studentDTOConverter.convertStudentToDTOWithoutList(subject.getStudentList()))
-                    .classroom(subject.getClassroom())
-                    .build();
+            subjectDTO = convertSubjectToDTOWithoutList(subject);
+
+            if(hasStudent)
+                subjectDTO.setStudentList(studentDTOConverter.convertStudentToDTO(subject.getStudentList(), true));
+            if(hasProfessor)
+                subjectDTO.setProfessorList(professorDTOConverter.convertProfessorToDTO(subject.getProfessorList(), true));
 
             subjectDTOList.add(subjectDTO);
         }
         return subjectDTOList;
-    }
-
-    public SubjectDTO convertSubjectToDTO(Subject subject){
-
-        return SubjectDTO
-                .builder()
-                .subjectType(subject.getSubjectType())
-                .studentList(studentDTOConverter.convertStudentToDTOWithoutList(subject.getStudentList()))
-                .professorList(professorDTOConverter.convertProfessorToDTOWithoutSubject(subject.getProfessorList()))
-                .id(subject.getId())
-                .classroom(subject.getClassroom())
-                .build();
-
     }
 
     public SubjectDTO convertSubjectToDTOWithoutList(Subject subject){
@@ -65,24 +50,6 @@ public class SubjectDTOConverter {
 
     }
 
-
-    public List<SubjectDTO> convertSubjectToDTOListWithoutList(List<Subject> subjectsList){
-
-        List<SubjectDTO> subjectDTOList = new ArrayList<>();
-
-
-        for(Subject subject : subjectsList){
-            SubjectDTO subjectDTO = SubjectDTO
-                    .builder()
-                    .subjectType(subject.getSubjectType())
-                    .id(subject.getId())
-                    .classroom(subject.getClassroom())
-                    .build();
-
-            subjectDTOList.add(subjectDTO);
-        }
-        return subjectDTOList;
-    }
 
 
 }

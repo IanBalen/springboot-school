@@ -8,9 +8,10 @@ import lombok.Data;
 @Builder
 public class ProfessorDTO {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long id;
-    private String name;
-    private String surname;
+    private String firstName;
+    private String lastName;
     private int age;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private SubjectDTO subject;

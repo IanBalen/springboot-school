@@ -10,6 +10,7 @@ import java.util.List;
 @Builder
 public class SubjectDTO {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long id;
     private String classroom;
     private String subjectType;

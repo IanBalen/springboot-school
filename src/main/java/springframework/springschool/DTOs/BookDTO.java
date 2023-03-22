@@ -3,20 +3,20 @@ package springframework.springschool.DTOs;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
+import springframework.springschool.domain.Person;
 
 import java.util.List;
 
 @Data
 @Builder
-public class StudentDTO {
+public class BookDTO {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long id;
-    private String firstName;
-    private String lastName;
-    private int age;
-    private int academicYear;
+    private String nameOfBook;
+    private String author;
+    private int numOfBook;
+    private boolean isBorrowed;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<SubjectDTO> subjectList;
+    private List<Person> personList;
 
 }

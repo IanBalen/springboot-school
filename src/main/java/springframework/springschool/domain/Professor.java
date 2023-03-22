@@ -1,25 +1,19 @@
 package springframework.springschool.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
-@Builder
+@SuperBuilder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Professor {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    private String name;
-    private String surname;
-    private int age;
+@PrimaryKeyJoinColumn(name = "person_id")
+public class Professor extends Person{
 
     @ManyToOne(cascade =  {
             CascadeType.DETACH,
