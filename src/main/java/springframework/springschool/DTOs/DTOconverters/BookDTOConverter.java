@@ -18,8 +18,8 @@ public class BookDTOConverter {
         for(Book book : books){
             bookDTO = BookDTO.builder()
                     .id(book.getId())
-                    .nameOfBook(book.getNameOfBook())
-                    .numOfBook(book.getNumOfBook())
+                    .name(book.getName())
+                    .num(book.getNum())
                     .author(book.getAuthor())
                     //.personList(book.getPersonList())
                     .isBorrowed(book.isBorrowed())

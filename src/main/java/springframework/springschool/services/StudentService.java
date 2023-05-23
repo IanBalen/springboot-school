@@ -13,6 +13,7 @@ import springframework.springschool.repository.BookRepository;
 import springframework.springschool.repository.StudentRepository;
 import springframework.springschool.repository.SubjectRepository;
 import springframework.springschool.services.request.CreateStudentRequest;
+import springframework.springschool.services.request.UpdateStudentRequest;
 import springframework.springschool.services.results.ActionResult;
 import springframework.springschool.services.results.DataResult;
 
@@ -66,7 +67,7 @@ public class StudentService {
         return new DataResult<>(studentDTOConverter.convertStudentToDTO(students, true), HttpStatus.FOUND);
     }
 
-    public ActionResult addNewStudent(CreateStudentRequest request) {
+    public ActionResult createStudent(CreateStudentRequest request) {
         List<Subject> subjectList = new ArrayList<>();
 
         List<String> listOfSubjectType = request.getSubjectTypeList();
@@ -135,32 +136,23 @@ public class StudentService {
     public ActionResult assignBookToStudent(Long id, String bookName){
 
         Optional<Student> studentOptional = studentRepository.findById(id);
-        List<Book> bookList = bookRepository.findBookByNameOfBook(bookName);
+        Optional<Book> bookOptional = bookRepository.findByNameAndBorrowedFalse(bookName);
 
-        if(studentOptional.isPresent() && !bookList.isEmpty()){
+        if(studentOptional.isPresent() && bookOptional.isPresent()){
 
             Student student = studentOptional.get();
+            Book book = bookOptional.get();
 
             List<Book> studentBookList = student.getBookList();
 
             for(Book b : studentBookList)
-                if(b.getNameOfBook().equals(bookName))
-                    throw new BadRequestException("Student already has this book");
+                if(b.getName().equals(bookName))
+                    throw new BadRequestException("Student has already borrowed this book");
 
-            boolean bookAssigned = false;
+            studentBookList.add(book);
+            book.setBorrowed(true);
 
-            for(Book b : bookList)
-                if(!b.isBorrowed()){
-                    student.getBookList().add(b);
-                    b.setBorrowed(true);
-                    bookRepository.save(b);
-                    bookAssigned = true;
-                    break;
-                }
-
-            if(!bookAssigned)
-                throw new BadRequestException("All books with this name are borrowed");
-
+            bookRepository.save(book);
             studentRepository.save(student);
 
             return new ActionResult("Book \"" + bookName + "\" has been borrowed to student.", HttpStatus.ACCEPTED);
@@ -170,7 +162,7 @@ public class StudentService {
             throw new BadRequestException("No students found with this name");
 
         else
-            throw new BadRequestException("No books found with this name");
+            throw new BadRequestException("No available books found with this name");
     }
 
     public ActionResult unassignBookFromStudent(Long studentId, Long bookId){
@@ -194,14 +186,41 @@ public class StudentService {
             studentRepository.save(student);
             bookRepository.save(book);
 
-            return new ActionResult("\"" + book.getNameOfBook() + "\" has been removed from student.", HttpStatus.ACCEPTED);
+            return new ActionResult("\"" + book.getName() + "\" has been removed from student.", HttpStatus.ACCEPTED);
         }
 
         else if(optionalStudent.isEmpty())
-            throw new BadRequestException("No students found with this name");
+            throw new BadRequestException("No students found with this name.");
 
         else
-            throw new BadRequestException("No books found with this name");
+            throw new BadRequestException("No book found with this id.");
     }
 
+    public ActionResult updateStudent(UpdateStudentRequest request) {
+
+        Optional<Student> studentOptional = studentRepository.findById(request.getId());
+
+        if (studentOptional.isPresent()) {
+            Student student = studentOptional.get();
+
+            if (request.getFirstName() != null)
+                student.setFirstName(request.getFirstName());
+
+            if (request.getLastName() != null)
+                student.setLastName(request.getLastName());
+
+            if (request.getAge() != 0)
+                student.setAge(request.getAge());
+
+            if (request.getAcademicYear() != 0)
+                student.setAcademicYear(request.getAcademicYear());
+
+            studentRepository.save(student);
+
+            return new ActionResult("Student has been updated", HttpStatus.ACCEPTED);
+        }
+        else
+            throw new BadRequestException("No students found with this name");
+
+    }
 }

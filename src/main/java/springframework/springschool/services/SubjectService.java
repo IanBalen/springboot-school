@@ -24,15 +24,12 @@ public class SubjectService {
 
     private final SubjectDTOConverter subjectDTOConverter;
 
-
-
-
     public DataResult<List<SubjectDTO>> getSubjects(){
         List<Subject> subjectList =  subjectRepository.findAll();
         return new DataResult<>(subjectDTOConverter.convertSubjectToDTO(subjectList, true, true), HttpStatus.FOUND);
     }
 
-    public ActionResult addNewSubject(CreateSubjectRequest request){
+    public ActionResult createSubject(CreateSubjectRequest request){
 
         if(!subjectRepository.existsBySubjectType(request.getSubjectType())) {
 

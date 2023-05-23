@@ -10,18 +10,17 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Documented
-@Retention(RUNTIME)
 @Target(TYPE)
-@Constraint(validatedBy = CreateStudentRequestValidator.class)
-public @interface ValidCreateStudentRequest {
+@Retention(RUNTIME)
+@Constraint(validatedBy = UpdateStudentRequestValidator.class)
+public @interface ValidUpdateStudentRequest {
 
-    String message() default "Invalid create student request.";
+    String message() default "Invalid update student request";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
-
-    String academicYearMessage() default "Academic year must be between 1 and 4";
-    String ageMessage() default "Age must be between 14 and 21";
     String firstNameMessage() default "First name can only contain letters";
     String lastNameMessage() default "Last name can only contain letters";
+    String ageMessage() default "Age must be between 14 and 21";
+    String academicYearMessage() default "Academic year must be between 1 and 4";
 
 }

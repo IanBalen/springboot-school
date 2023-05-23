@@ -33,16 +33,16 @@ public class ProfessorController {
     }
 
     @PostMapping
-    public ResponseEntity<ActionResult> addNewProfessor(@RequestBody @Valid CreateProfessorRequest request) {
-        return ResponseEntity.ok(professorService.addNewProfessor(request));
+    public ResponseEntity<ActionResult> createProfessor(@RequestBody @Valid CreateProfessorRequest request) {
+        return ResponseEntity.ok(professorService.createProfessor(request));
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<ActionResult> editSubject(
+    public ResponseEntity<ActionResult> updateSubject(
             @PathVariable(value = "id") Long id,
             @RequestParam String subjectType
     ){
-        return ResponseEntity.ok(professorService.editSubject(id , subjectType));
+        return ResponseEntity.ok(professorService.updateSubject(id , subjectType));
         }
 
     @DeleteMapping(path = "/{id}")
@@ -50,7 +50,7 @@ public class ProfessorController {
          return ResponseEntity.ok(professorService.deleteProfessor(id));
     }
 
-    @PutMapping(path = "/b{id}/{bookName}")
+    @PutMapping(path = "/{id}/{bookName}")
     public ResponseEntity<ActionResult> assignBookToProfessor(@PathVariable(value = "id") Long id,
                                               @PathVariable(value = "bookName") String bookName){
         return ResponseEntity.ok(professorService.assignBookToProfessor(id, bookName));

@@ -24,8 +24,8 @@ public class BookController {
     }
 
     @PostMapping
-    public ResponseEntity<ActionResult> AddBook(@RequestBody CreateBookRequest bookRequest) {
-        return ResponseEntity.ok(bookService.AddBook(bookRequest));
+    public ResponseEntity<ActionResult> createBook(@RequestBody CreateBookRequest bookRequest) {
+        return ResponseEntity.ok(bookService.createBook(bookRequest));
     }
 
 

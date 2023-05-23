@@ -1,40 +1,30 @@
 package springframework.springschool.services.validation;
 
-import springframework.springschool.services.request.CreateStudentRequest;
+import springframework.springschool.services.request.UpdateStudentRequest;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class CreateStudentRequestValidator implements ConstraintValidator<ValidCreateStudentRequest, CreateStudentRequest> {
+public class UpdateStudentRequestValidator implements ConstraintValidator<ValidUpdateStudentRequest, UpdateStudentRequest> {
 
-    String academicYearMessage;
-    String ageMessage;
-    String firstNameMessage;
-    String lastNameMessage;
-    String message;
+    private String firstNameMessage;
+    private String lastNameMessage;
+    private String ageMessage;
+    private String academicYearMessage;
 
 
     @Override
-    public void initialize(ValidCreateStudentRequest constraintAnnotation) {
-        this.message = constraintAnnotation.message();
-        this.academicYearMessage = constraintAnnotation.academicYearMessage();
-        this.ageMessage = constraintAnnotation.ageMessage();
-        this.firstNameMessage = constraintAnnotation.firstNameMessage();
-        this.lastNameMessage = constraintAnnotation.lastNameMessage();
+    public void initialize(ValidUpdateStudentRequest constraintAnnotation) {
+        firstNameMessage = constraintAnnotation.firstNameMessage();
+        lastNameMessage = constraintAnnotation.lastNameMessage();
+        ageMessage = constraintAnnotation.ageMessage();
+        academicYearMessage = constraintAnnotation.academicYearMessage();
     }
 
     @Override
-    public boolean isValid(CreateStudentRequest request, ConstraintValidatorContext context) {
+    public boolean isValid(UpdateStudentRequest request, ConstraintValidatorContext context) {
 
         boolean valid = true;
-
-        if(request.getFirstName() == null || request.getLastName() == null || request.getAge() == 0 || request.getAcademicYear() == 0){
-            context.buildConstraintViolationWithTemplate(message)
-                    .addPropertyNode("firstName")
-                    .addConstraintViolation();
-            return false;
-        }
-
 
         if(request.getAcademicYear() > 4 || request.getAcademicYear() < 1){
             context.buildConstraintViolationWithTemplate(academicYearMessage)

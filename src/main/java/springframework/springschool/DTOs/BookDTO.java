@@ -12,9 +12,9 @@ import java.util.List;
 public class BookDTO {
 
     private Long id;
-    private String nameOfBook;
+    private String name;
     private String author;
-    private int numOfBook;
+    private int num;
     private boolean isBorrowed;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Person> personList;

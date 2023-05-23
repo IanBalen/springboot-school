@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import springframework.springschool.DTOs.StudentDTO;
 import springframework.springschool.services.StudentService;
 import springframework.springschool.services.request.CreateStudentRequest;
+import springframework.springschool.services.request.UpdateStudentRequest;
 import springframework.springschool.services.results.ActionResult;
 import springframework.springschool.services.results.DataResult;
 
@@ -50,8 +51,8 @@ public class StudentController {
     }
 
     @PostMapping
-    public ResponseEntity<ActionResult> addNewStudent(@RequestBody @Valid CreateStudentRequest request){
-        return ResponseEntity.ok(studentService.addNewStudent(request));
+    public ResponseEntity<ActionResult> createStudent(@RequestBody @Valid CreateStudentRequest request){
+        return ResponseEntity.ok(studentService.createStudent(request));
     }
 
     @DeleteMapping("/{id}")
@@ -75,6 +76,11 @@ public class StudentController {
     public ResponseEntity<ActionResult> unassignBookFromStudent(@PathVariable(value = "studentId") Long studentId,
                                                                 @PathVariable(value = "bookId") Long bookId){
         return ResponseEntity.ok(studentService.unassignBookFromStudent(studentId, bookId));
+    }
+
+    @PutMapping
+    public ResponseEntity<ActionResult> updateStudent(@RequestBody @Valid UpdateStudentRequest request){
+        return ResponseEntity.ok(studentService.updateStudent(request));
     }
 
 

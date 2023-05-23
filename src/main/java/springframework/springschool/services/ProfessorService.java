@@ -46,9 +46,8 @@ public class ProfessorService {
             return new DataResult<>(professorDTOConverter.convertProfessorToDTO(professors, true), HttpStatus.FOUND);
     }
 
-    public ActionResult addNewProfessor(CreateProfessorRequest request){
+    public ActionResult createProfessor(CreateProfessorRequest request){
 
-        boolean hasId = Objects.nonNull(request.getSubjectId());
         boolean hasName = Objects.nonNull(request.getSubjectName());
 
         Professor professor = Professor.builder()
@@ -57,14 +56,6 @@ public class ProfessorService {
                 .age(request.getAge())
                 .build();
 
-
-        if(hasId) {
-            Optional<Subject> subject = subjectRepository.findById(request.getSubjectId());
-            if(subject.isPresent())
-                professor.setSubject(subject.get());
-            else
-                throw new BadRequestException("No subject found with this id");
-        }
 
         if(hasName) {
             Optional<Subject> subject = subjectRepository.findBySubjectType(request.getSubjectName());
@@ -78,7 +69,7 @@ public class ProfessorService {
         return new ActionResult("Professor has been added to the database", HttpStatus.CREATED);
     }
 
-    public ActionResult editSubject(Long id, String subjectType) {
+    public ActionResult updateSubject(Long id, String subjectType) {
 
         Optional<Professor> professorOptional = professorRepository.findById(id);
 
@@ -107,32 +98,23 @@ public class ProfessorService {
     public ActionResult assignBookToProfessor(Long id, String bookName){
 
         Optional<Professor> professorOptional = professorRepository.findById(id);
-        List<Book> bookList = bookRepository.findBookByNameOfBook(bookName);
+        Optional<Book> bookOptional = bookRepository.findByNameAndBorrowedFalse(bookName);
 
-        if(professorOptional.isPresent() && !bookList.isEmpty()){
+        if(professorOptional.isPresent() && bookOptional.isPresent()){
 
             Professor professor = professorOptional.get();
+            Book book = bookOptional.get();
 
             List<Book> professorBookList = professor.getBookList();
 
             for(Book b : professorBookList)
-                if(b.getNameOfBook().equals(bookName))
+                if(b.getName().equals(bookName))
                     throw new BadRequestException("Professor already has this book.");
 
-            boolean bookAssigned = false;
+            professorBookList.add(book);
+            book.setBorrowed(true);
 
-            for(Book b : bookList)
-                if(!b.isBorrowed()){
-                    professor.getBookList().add(b);
-                    b.setBorrowed(true);
-                    bookRepository.save(b);
-                    bookAssigned = true;
-                    break;
-                }
-
-            if(!bookAssigned)
-                throw new BadRequestException("All books with this name are borrowed.");
-
+            bookRepository.save(book);
             professorRepository.save(professor);
 
             return new ActionResult("Book \"" + bookName + "\" has been borrowed to professor.", HttpStatus.ACCEPTED);
@@ -166,7 +148,7 @@ public class ProfessorService {
             professorRepository.save(student);
             bookRepository.save(book);
 
-            return new ActionResult("\"" + book.getNameOfBook() + "\" has been removed from professor.", HttpStatus.ACCEPTED);
+            return new ActionResult("\"" + book.getName() + "\" has been removed from professor.", HttpStatus.ACCEPTED);
         }
 
         else if(optionalProfessor.isEmpty())

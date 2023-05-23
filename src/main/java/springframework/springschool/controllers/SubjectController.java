@@ -21,7 +21,7 @@ public class SubjectController {
     private final SubjectService subjectService;
 
     @GetMapping
-    public ResponseEntity<DataResult<List<SubjectDTO>>>getSubjects(
+    public ResponseEntity<DataResult<List<SubjectDTO>>> getSubjects(
             @RequestParam(required = false) String classroom,
             @RequestParam(required = false) String subjectType
             ){
@@ -40,8 +40,8 @@ public class SubjectController {
     }
 
     @PostMapping
-    public ResponseEntity<ActionResult> addNewSubject(@RequestBody @Valid CreateSubjectRequest request){
-        return ResponseEntity.ok(subjectService.addNewSubject(request));
+    public ResponseEntity<ActionResult> createSubject(@RequestBody @Valid CreateSubjectRequest request){
+        return ResponseEntity.ok(subjectService.createSubject(request));
     }
 
     @DeleteMapping("/{id}")

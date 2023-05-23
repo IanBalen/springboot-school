@@ -29,13 +29,13 @@ public class BookService {
         return new DataResult<>(bookDTOConverter.convertBookToDTO(bookList), HttpStatus.FOUND);
     }
 
-    public ActionResult AddBook(CreateBookRequest request){
+    public ActionResult createBook(CreateBookRequest request){
 
-        List<Book> bookList = bookRepository.findBookByNameOfBook(request.getNameOfBook());
+        List<Book> bookList = bookRepository.findByName(request.getNameOfBook());
 
             Book book = Book.builder()
-                    .numOfBook(request.getNumOfBook())
-                    .nameOfBook(request.getNameOfBook())
+                    .num(request.getNumOfBook())
+                    .name(request.getNameOfBook())
                     .personList(request.getPersonList())
                     .author(request.getAuthor())
                     .build();

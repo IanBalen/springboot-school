@@ -17,9 +17,9 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String nameOfBook;
+    private String name;
     private String author;
-    private int numOfBook;
+    private int num;
     private boolean borrowed;
     @ManyToMany(cascade =  {
             CascadeType.DETACH,
@@ -35,7 +35,7 @@ public class Book {
     private List<Person> personList;
 
     public void incrementNumOfBook(int num){
-        numOfBook += num;
+        num += num;
     }
 
     @Override
@@ -45,11 +45,11 @@ public class Book {
 
         Book book = (Book) o;
 
-        return this.nameOfBook.equals(book.getNameOfBook());
+        return this.name.equals(book.getName());
     }
 
     @Override
     public int hashCode() {
-        return nameOfBook.hashCode();
+        return name.hashCode();
     }
 }
